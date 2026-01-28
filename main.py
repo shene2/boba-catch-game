@@ -12,6 +12,9 @@ pygame.display.set_caption("Boba Catch 🧋")
 # Clock
 clock = pygame.time.Clock()
 
+# Font
+font = pygame.font.SysFont("arial", 28)
+
 # Player settings
 player_width = 60
 player_height = 40
@@ -24,6 +27,9 @@ boba_radius = 15
 boba_x = random.randint(boba_radius, WIDTH - boba_radius)
 boba_y = -boba_radius
 boba_speed = 4
+
+# Score
+score = 0
 
 # Game loop
 running = True
@@ -50,26 +56,45 @@ while running:
     # Move boba
     boba_y += boba_speed
 
-    # Reset boba if it goes off screen
+    # Player rectangle (for collision)
+    player_rect = pygame.Rect(player_x, player_y, player_width, player_height)
+    boba_rect = pygame.Rect(
+        boba_x - boba_radius,
+        boba_y - boba_radius,
+        boba_radius * 2,
+        boba_radius * 2
+    )
+
+    # Collision detection
+    if player_rect.colliderect(boba_rect):
+        score += 1
+        boba_y = -boba_radius
+        boba_x = random.randint(boba_radius, WIDTH - boba_radius)
+
+    # Reset boba if missed
     if boba_y > HEIGHT:
         boba_y = -boba_radius
         boba_x = random.randint(boba_radius, WIDTH - boba_radius)
 
     # Drawing
-    screen.fill((255, 230, 240))  # pastel pink background
+    screen.fill((255, 230, 240))  # background
+
+    # Draw score
+    score_text = font.render(f"Score: {score}", True, (80, 50, 120))
+    screen.blit(score_text, (20, 20))
 
     # Draw player
     pygame.draw.rect(
         screen,
         (180, 120, 255),
-        (player_x, player_y, player_width, player_height),
+        player_rect,
         border_radius=12
     )
 
     # Draw boba
     pygame.draw.circle(
         screen,
-        (120, 80, 40),  # boba brown
+        (120, 80, 40),
         (boba_x, boba_y),
         boba_radius
     )
